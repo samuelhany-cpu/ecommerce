@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# LuxeLeather E-Commerce
 
-## Getting Started
+Premium organic leather bags e-commerce platform built with Next.js, MySQL, and MongoDB.
 
-First, run the development server:
+## Features
+- **Frontend**: Next.js 14+ (App Router), TailwindCSS, Framer Motion (animations via CSS).
+- **Database**: 
+  - **MongoDB**: Stores Product data (flexible schema).
+  - **MySQL**: Stores Users and Orders (relational data).
+- **Authentication**: JWT-based secure auth with HTTP-Only cookies.
+- **Admin Dashboard**: Manage products, view stats (protected route).
+- **Notifications**: Email notifications for Users and Admins upon order using Nodemailer.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Prerequisites
+1. **Node.js**: 18.17+
+2. **MongoDB**: Running on `localhost:27017`
+3. **MySQL**: Running on `localhost:3306`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Environment Variables**
+   The `.env.local` file is pre-configured for local development. Ensure your Database credentials match.
 
-## Learn More
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/ecommerce_db
+   MYSQL_HOST=localhost
+   MYSQL_USER=root
+   MYSQL_PASSWORD=
+   MYSQL_DATABASE=ecommerce_db
+   JWT_SECRET=complex_secret_key
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. **Database Setup**
+   - Ensure MongoDB is running.
+   - Ensure MySQL is running. The app will automatically attempt to create tables (`sequelize.sync()`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Run Development Server**
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. **Access**
+   - **Store**: http://localhost:3000
+   - **Admin**: http://localhost:3000/admin (Redirects to login)
+   - **Login**: Use `admin@luxeleather.com` (Password: any for first time, it auto-creates admin account for demo).
 
-## Deploy on Vercel
+## Project Structure
+- `src/app`: App Router pages and API routes.
+- `src/components`: Reusable UI components.
+- `src/lib`: Database and Auth utilities.
+- `src/models`: Database Models (Mongoose & Sequelize).
+- `src/context`: React Context (Cart).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Security
+- JWT Tokens are stored in HTTP-Only cookies to prevent XSS.
+- CSRF protection via SameSite cookie policy.
+- Middleware protects `/admin` routes.
+- Logout clears the cookie from the browser.
