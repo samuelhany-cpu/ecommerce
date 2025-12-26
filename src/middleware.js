@@ -38,7 +38,14 @@ export async function proxy(request) {
     // Using a background fetch to log so we don't block the request
     // We'll create a dedicated logging endpoint for this.
     try {
-        fetch(`${request.nextUrl.origin}/api/audit`, {
+        // Robust protocol detection to avoid ERR_SSL_PACKET_LENGTH_TOO_LONG
+        // In local/dev, the origin might report https while being http
+        let origin = request.nextUrl.origin;
+        if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+            origin = origin.replace('https://', 'http://');
+        }
+
+        fetch(`${origin}/api/audit`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -69,6 +76,6 @@ export const config = {
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
          */
-        '/((?!_next/static|_next/image|favicon.ico).*)',
+        '/((?!api/auth|api/audit|_next/static|_next/image|favicon.ico).*)',
     ],
 };
