@@ -1,0 +1,88 @@
+{
+  "orders": [
+    {
+      "id": 1,
+      "userId": 2,
+      "totalAmount": "329.50",
+      "status": "delivered",
+      "items": "[{\"name\":\"Classic Cognac Messenger\",\"price\":249.99,\"quantity\":1},{\"name\":\"Minimalist Bifold Wallet\",\"price\":79.5,\"quantity\":1}]",
+      "createdAt": "2025-12-25T16:33:30.000Z",
+      "updatedAt": "2025-12-25T18:34:05.000Z"
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "totalAmount": "55.00",
+      "status": "shipped",
+      "items": "[{\"name\":\"Exec Cardholder\",\"price\":55,\"quantity\":1}]",
+      "createdAt": "2025-12-25T16:33:30.000Z",
+      "updatedAt": "2025-12-25T16:33:30.000Z"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "totalAmount": "55.00",
+      "status": "pending",
+      "items": "[{\"_id\":\"694d675a65b17be116aae909\",\"name\":\"Exec Cardholder\",\"description\":\"For the professional who travels light. Textured premium leather cardholder with gold-foil embossing.\",\"price\":55,\"category\":\"Men\",\"images\":[\"/images/hero-cardholder.png\"],\"stock\":25,\"createdAt\":\"2025-12-25T16:33:30.189Z\",\"__v\":0,\"quantity\":1}]",
+      "createdAt": "2025-12-25T17:02:21.000Z",
+      "updatedAt": "2025-12-25T17:02:21.000Z"
+    },
+    {
+      "id": 4,
+      "userId": 1,
+      "totalAmount": "450.00",
+      "status": "delivering",
+      "items": "[{\"_id\":\"694d675a65b17be116aae90a\",\"name\":\"Weekender Duffel\",\"description\":\"The ultimate travel companion. Rugged yet refined, this large duffel bag fits everything you need for a 3-day trip.\",\"price\":450,\"category\":\"Accessories\",\"images\":[\"/images/messenger.png\"],\"stock\":5,\"createdAt\":\"2025-12-25T16:33:30.189Z\",\"__v\":0,\"reviews\":[],\"quantity\":1}]",
+      "createdAt": "2025-12-25T17:10:46.000Z",
+      "updatedAt": "2025-12-25T18:34:00.000Z"
+    },
+    {
+      "id": 5,
+      "userId": 1,
+      "totalAmount": "249.99",
+      "status": "pending",
+      "items": "[{\"_id\":\"694d675a65b17be116aae906\",\"name\":\"Classic Cognac Messenger\",\"description\":\"A vintage-inspired messenger bag crafted from full-grain organic leather. Features antiqued brass hardware and a spacious interior for a 15-inch laptop.\",\"price\":249.99,\"category\":\"Men\",\"images\":[\"/images/messenger.png\"],\"stock\":12,\"createdAt\":\"2025-12-25T16:33:30.188Z\",\"__v\":0,\"reviews\":[],\"quantity\":1}]",
+      "createdAt": "2025-12-25T17:15:50.000Z",
+      "updatedAt": "2025-12-25T17:15:50.000Z"
+    },
+    {
+      "id": 6,
+      "userId": 3,
+      "totalAmount": "79.50",
+      "status": "approved",
+      "items": "[{\"_id\":\"694d675a65b17be116aae907\",\"name\":\"Minimalist Bifold Wallet\",\"description\":\"Slim, durable, and elegant. This dark brown leather wallet ages gracefully, featuring 6 card slots and a currency sleeve.\",\"price\":79.5,\"category\":\"Accessories\",\"images\":[\"/images/wallet.png\"],\"stock\":50,\"createdAt\":\"2025-12-25T16:33:30.188Z\",\"__v\":0,\"reviews\":[],\"quantity\":1}]",
+      "createdAt": "2025-12-25T17:38:01.000Z",
+      "updatedAt": "2025-12-25T18:33:54.000Z"
+    }
+  ],
+  "otps": [],
+  "users": [
+    {
+      "id": 1,
+      "email": "samuelhany500@gmail.com",
+      "password": "$2b$10$4OEG781gnUc5PRVl6RUgLeacEneo5PNFGtiZqkSQQ9DkSz7uZeZLO",
+      "role": "admin",
+      "createdAt": "2025-12-25T16:33:30.000Z",
+      "updatedAt": "2025-12-25T18:02:38.000Z",
+      "isVerified": 0
+    },
+    {
+      "id": 2,
+      "email": "john@example.com",
+      "password": "$2b$10$khds3m5HW6/BlSjTazyhkO0jKrbMoSL0kklyu7rS3PgI.vzmY29Ae",
+      "role": "user",
+      "createdAt": "2025-12-25T16:33:30.000Z",
+      "updatedAt": "2025-12-25T16:33:30.000Z",
+      "isVerified": 0
+    },
+    {
+      "id": 3,
+      "email": "patrickhany105@gmail.com",
+      "password": "$2b$10$wJp5hKujLduaWHAnVjazX.lqm8i9HEIkVhk0glR9HKW6p.X9RPFiS",
+      "role": "user",
+      "createdAt": "2025-12-25T17:37:22.000Z",
+      "updatedAt": "2025-12-25T17:37:43.000Z",
+      "isVerified": 1
+    }
+  ]
+}

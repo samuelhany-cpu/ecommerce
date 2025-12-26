@@ -1,35 +1,35 @@
-import sequelize from '@/lib/mysql';
+import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { signToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
-// Initialize DB sync (in production this should be a migration script)
-// const syncDb = async () => { await sequelize.sync(); };
-// syncDb();
-
 export async function POST(req) {
     try {
-        // Ensure tables exist - strictly for dev/demo purposes
-        await sequelize.sync();
-
+        await dbConnect();
         const { email, password } = await req.json();
 
         // Check if user exists
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ email });
 
         // For demo: create admin if not exists
-        if (!user && email === 'admin@luxeleather.com') {
+        if (!user && email === 'samuelhany500@gmail.com') {
             const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = await User.create({ email, password: hashedPassword, role: 'admin' });
-            const token = signToken({ id: newUser.id, role: newUser.role });
+            const newUser = await User.create({
+                email,
+                password: hashedPassword,
+                role: 'admin',
+                isVerified: true // Primary admin is pre-verified
+            });
+            const token = await signToken({ id: newUser._id.toString(), role: newUser.role, email: newUser.email });
 
             const response = NextResponse.json({ success: true, user: { email: newUser.email, role: newUser.role } });
             response.cookies.set('token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 86400
+                sameSite: 'lax',
+                maxAge: 86400,
+                path: '/'
             });
             return response;
         }
@@ -43,15 +43,26 @@ export async function POST(req) {
             return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 });
         }
 
-        const token = signToken({ id: user.id, role: user.role });
+        // Check verification status (Primary admin is exempt)
+        if (!user.isVerified && user.email !== 'samuelhany500@gmail.com') {
+            return NextResponse.json({
+                success: false,
+                error: 'Please verify your email address before logging in.',
+                needsVerification: true,
+                email: user.email
+            }, { status: 403 });
+        }
+
+        const token = await signToken({ id: user._id.toString(), role: user.role, email: user.email });
         const response = NextResponse.json({ success: true, user: { email: user.email, role: user.role } });
 
         // Set Secure Cookie
         response.cookies.set('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 86400
+            sameSite: 'lax',
+            maxAge: 86400,
+            path: '/'
         });
 
         return response;

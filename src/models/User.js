@@ -1,28 +1,47 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '@/lib/mysql';
+import mongoose from 'mongoose';
 
-const User = sequelize.define('User', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-    },
+const UserSchema = new mongoose.Schema({
     email: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: String,
+        required: true,
         unique: true,
-        validate: { isEmail: true },
+        lowercase: true,
+        trim: true,
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
     },
     password: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: String,
+        required: true,
     },
     role: {
-        type: DataTypes.ENUM('user', 'admin'),
-        defaultValue: 'user',
+        type: String,
+        enum: ['customer', 'admin'],
+        default: 'customer',
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    firstName: {
+        type: String,
+        trim: true,
+    },
+    lastName: {
+        type: String,
+        trim: true,
+    },
+    phone: {
+        type: String,
+        trim: true,
+    },
+    dateOfBirth: {
+        type: Date,
+    }
 }, {
-    timestamps: true,
+    timestamps: true
 });
 
-export default User;
+// Compound index for email and verification status
+UserSchema.index({ email: 1, isVerified: 1 });
+
+export default mongoose.models.User || mongoose.model('User', UserSchema);

@@ -1,39 +1,72 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '@/lib/mysql';
-import User from './User';
+import mongoose from 'mongoose';
 
-const Order = sequelize.define('Order', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-    },
+const OrderSchema = new mongoose.Schema({
     userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: User,
-            key: 'id',
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+        index: true
     },
     totalAmount: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
+        type: Number,
+        required: true,
+        min: 0
     },
     status: {
-        type: DataTypes.ENUM('pending', 'paid', 'shipped', 'cancelled'),
-        defaultValue: 'pending',
+        type: String,
+        enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+        default: 'pending'
     },
-    items: {
-        type: DataTypes.JSON, // Storing product details/IDs as JSON for simplicity in hybrid MySQL/Mongo setup
-        allowNull: false,
+    shippingAddressId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address'
     },
+    billingAddressId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address'
+    },
+    paymentMethod: {
+        type: String,
+        enum: ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery'],
+        default: 'cash_on_delivery'
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['pending', 'paid', 'failed', 'refunded'],
+        default: 'pending'
+    },
+    transactionId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    shippingCost: {
+        type: Number,
+        default: 0
+    },
+    taxAmount: {
+        type: Number,
+        default: 0
+    },
+    discountAmount: {
+        type: Number,
+        default: 0
+    },
+    trackingNumber: {
+        type: String
+    },
+    notes: {
+        type: String
+    }
 }, {
-    timestamps: true,
+    timestamps: true
 });
 
-// Define association
-User.hasMany(Order, { foreignKey: 'userId' });
-Order.belongsTo(User, { foreignKey: 'userId' });
+// To easily fetch items related to this order
+OrderSchema.virtual('orderItems', {
+    ref: 'OrderItem',
+    localField: '_id',
+    foreignField: 'orderId'
+});
 
-export default Order;
+export default mongoose.models.Order || mongoose.model('Order', OrderSchema);

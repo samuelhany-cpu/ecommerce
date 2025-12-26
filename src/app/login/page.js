@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -32,6 +33,11 @@ export default function LoginPage() {
                 router.refresh();
             } else {
                 setError(data.error);
+                if (data.needsVerification) {
+                    // Option to redirect to register page with state or just show error
+                    setError(data.error + " Redirecting you to verify...");
+                    setTimeout(() => router.push('/register'), 2000);
+                }
             }
         } catch (err) {
             setError('Something went wrong');
@@ -54,7 +60,7 @@ export default function LoginPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                            placeholder="admin@luxeleather.com"
+                            placeholder="samuelhany500@gmail.com"
                             required
                         />
                     </div>
@@ -78,7 +84,7 @@ export default function LoginPage() {
                 </form>
 
                 <p className="mt-6 text-center text-sm opacity-60">
-                    Don't have an account? <span className="text-secondary cursor-pointer hover:underline">Register</span>
+                    Don't have an account? <Link href="/register" className="text-secondary font-bold hover:underline">Create Account</Link>
                 </p>
             </div>
         </div>

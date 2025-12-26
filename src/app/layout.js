@@ -2,6 +2,7 @@ import { Outfit, Cormorant_Garamond } from "next/font/google"; // Premium fonts
 import Navbar from "@/components/Navbar";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/CartDrawer";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
       >
         <CartProvider>
           <Navbar />
+          <CartDrawer />
           <main className="flex-grow pt-20">
             {children}
           </main>

@@ -1,0 +1,97 @@
+test_01_registration_flow (__main__.EcommerceTest.test_01_registration_flow) ... ok
+test_02_login_logout (__main__.EcommerceTest.test_02_login_logout) ... ERROR
+test_03_shopping_cart_operations (__main__.EcommerceTest.test_03_shopping_cart_operations) ... ERROR
+test_04_checkout_flow (__main__.EcommerceTest.test_04_checkout_flow) ... ERROR
+test_05_user_profile (__main__.EcommerceTest.test_05_user_profile) ... ERROR
+test_06_admin_dashboard (__main__.EcommerceTest.test_06_admin_dashboard) ... ok
+test_07_admin_product_crud (__main__.EcommerceTest.test_07_admin_product_crud) ... ok
+test_08_admin_order_management (__main__.EcommerceTest.test_08_admin_order_management) ... ok
+
+======================================================================
+ERROR: test_02_login_logout (__main__.EcommerceTest.test_02_login_logout)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "f:\ecommerce\scripts\test_website.py", line 53, in test_02_login_logout
+    logout_btn = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Logout')]")))
+  File "C:\Users\Samuel\AppData\Local\Programs\Python\Python313\Lib\site-packages\selenium\webdriver\support\wait.py", line 122, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:202:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:555:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+
+======================================================================
+ERROR: test_03_shopping_cart_operations (__main__.EcommerceTest.test_03_shopping_cart_operations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "f:\ecommerce\scripts\test_website.py", line 73, in test_03_shopping_cart_operations
+    add_btn = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Add to Cart')]")))
+  File "C:\Users\Samuel\AppData\Local\Programs\Python\Python313\Lib\site-packages\selenium\webdriver\support\wait.py", line 122, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+
+
+======================================================================
+ERROR: test_04_checkout_flow (__main__.EcommerceTest.test_04_checkout_flow)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "f:\ecommerce\scripts\test_website.py", line 99, in test_04_checkout_flow
+    self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Add to Cart')]"))).click()
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel\AppData\Local\Programs\Python\Python313\Lib\site-packages\selenium\webdriver\support\wait.py", line 122, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+
+
+======================================================================
+ERROR: test_05_user_profile (__main__.EcommerceTest.test_05_user_profile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "f:\ecommerce\scripts\test_website.py", line 137, in test_05_user_profile
+    self.wait.until(EC.presence_of_element_located((By.XPATH, "//h1")))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel\AppData\Local\Programs\Python\Python313\Lib\site-packages\selenium\webdriver\support\wait.py", line 122, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:202:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:555:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+
+----------------------------------------------------------------------
+Ran 8 tests in 289.570s
+
+FAILED (errors=4)
+
+--- Testing Registration Flow ---
+[OK] Registration successful for test_1766763602@example.com
+
+--- Testing Login/Logout Flow ---
+[OK] Customer login successful
+
+--- Testing Shopping and Cart ---
+
+--- Testing Checkout Flow ---
+
+--- Testing User Profile ---
+
+--- Testing Admin Dashboard ---
+[OK] Admin dashboard accessible
+
+--- Testing Admin Product CRUD ---
+Creating product...
+[INFO] Product CRUD partial success: Message: 
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:202:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:555:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+
+--- Testing Admin Order Management ---
+[OK] Orders tab accessible (no orders yet)

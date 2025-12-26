@@ -1,13 +1,17 @@
 "use client";
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+
+const categories = ["All", "Women", "Men", "Accessories"];
 
 export default function ShopPage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { addToCart } = useCart();
     const [filter, setFilter] = useState('All');
+    const [notification, setNotification] = useState(null);
+    const { addToCart } = useCart();
+    const router = useRouter();
 
     useEffect(() => {
         async function loadProducts() {
@@ -26,19 +30,40 @@ export default function ShopPage() {
         loadProducts();
     }, []);
 
-    const filteredProducts = filter === 'All' ? products : products.filter(p => p.category === filter);
+    const handleAddToCart = (product) => {
+        addToCart(product);
+        setNotification(`${product.name} added to cart!`);
+        setTimeout(() => setNotification(null), 3000);
+    };
+
+    const filteredProducts = filter === 'All'
+        ? products
+        : products.filter(p => p.category === filter);
 
     return (
-        <div className="container mx-auto px-6 py-12">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-12">
-                <h1 className="text-4xl font-serif font-bold text-primary dark:text-cream">Shop Collection</h1>
+        <div className="container mx-auto px-6 py-12 relative min-h-screen">
+            {/* Toast Notification */}
+            {notification && (
+                <div className="fixed top-24 right-6 z-50 animate-bounce-subtle">
+                    <div className="bg-primary text-cream px-6 py-3 rounded-lg shadow-2xl border border-secondary/20 flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+                        <span className="font-semibold tracking-wide">{notification}</span>
+                    </div>
+                </div>
+            )}
 
-                <div className="flex gap-4 mt-6 md:mt-0">
-                    {['All', 'Women', 'Men', 'Accessories'].map(cat => (
+            <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary dark:text-cream tracking-tight">Shop Collection</h1>
+
+                <div className="flex flex-wrap gap-4">
+                    {categories.map((cat) => (
                         <button
                             key={cat}
                             onClick={() => setFilter(cat)}
-                            className={`px-4 py-2 rounded-full text-sm uppercase tracking-wide transition-all ${filter === cat ? 'bg-primary text-white shadow-md' : 'text-primary dark:text-cream hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
+                            className={`px-8 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase transition-all duration-300 ${filter === cat
+                                ? "bg-primary text-cream shadow-xl scale-105"
+                                : "bg-white dark:bg-zinc-800 text-primary/60 dark:text-cream/60 border border-zinc-200 dark:border-zinc-700 hover:border-primary"
+                                }`}
                         >
                             {cat}
                         </button>
@@ -47,36 +72,87 @@ export default function ShopPage() {
             </div>
 
             {loading ? (
-                <div className="h-64 flex items-center justify-center opacity-50">Loading collection...</div>
+                <div className="h-96 flex flex-col items-center justify-center opacity-30 gap-4">
+                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm font-bold tracking-widest uppercase">Curating Collection...</p>
+                </div>
             ) : (
-                <div className="grid md:grid-cols-3 gap-8">
-                    {filteredProducts.map(product => (
-                        <div key={product._id} className="group bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
-                            <div className="relative h-[300px] w-full bg-zinc-100 dark:bg-zinc-800">
-                                {/* Placeholder for product image if not present */}
-                                <div className="absolute inset-0 flex items-center justify-center text-zinc-400">
-                                    {product.images?.[0] ? (
-                                        <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <span>No Image</span>
-                                    )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                    {filteredProducts.map((product) => (
+                        <div key={product._id} className="group relative flex flex-col bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700">
+                            <div
+                                className="relative aspect-[4/5] overflow-hidden bg-cream cursor-pointer"
+                                onClick={() => router.push(`/shop/${product._id}`)}
+                            >
+                                {product.images?.[0] ? (
+                                    <>
+                                        <img
+                                            src={product.images[0]}
+                                            alt={product.name}
+                                            className={`w-full h-full object-cover transition-all duration-1000 ${product.images[1] ? 'group-hover:opacity-0' : 'group-hover:scale-110'}`}
+                                        />
+                                        {product.images[1] && (
+                                            <img
+                                                src={product.images[1]}
+                                                alt={`${product.name} detail`}
+                                                className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-1000 scale-105 group-hover:scale-100"
+                                            />
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-zinc-300 text-xs font-bold tracking-widest uppercase bg-zinc-50">No Image Preview</div>
+                                )}
+
+                                <div className="absolute top-4 left-4">
+                                    <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-primary shadow-sm">
+                                        {product.category}
+                                    </span>
                                 </div>
-                                <button
-                                    onClick={() => addToCart(product)}
-                                    className="absolute bottom-4 right-4 bg-white dark:bg-charcoal text-primary dark:text-cream p-3 rounded-full shadow-lg translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
-                                </button>
+
+                                {/* Premium Add to Cart Overlay */}
+                                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-10">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAddToCart(product);
+                                        }}
+                                        className="w-full py-4 bg-white text-primary font-bold rounded-xl shadow-2xl flex items-center justify-center gap-3 hover:bg-secondary hover:text-white transition-all transform hover:scale-[1.02] active:scale-95"
+                                    >
+                                        <span className="text-xl">+</span> Add to Cart
+                                    </button>
+                                </div>
                             </div>
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="text-xl font-serif font-bold">{product.name}</h3>
-                                    <span className="font-mono text-lg text-secondary">${product.price}</span>
+
+                            <div className="p-8 grow flex flex-col">
+                                <div
+                                    className="cursor-pointer group/title"
+                                    onClick={() => router.push(`/shop/${product._id}`)}
+                                >
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="text-xl font-bold tracking-tight text-primary dark:text-cream leading-tight group-hover/title:text-secondary transition-colors italic font-serif underline decoration-transparent group-hover/title:decoration-secondary decoration-2 underline-offset-4">
+                                            {product.name}
+                                        </h3>
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-secondary font-mono font-black text-lg">${product.price}</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-sm opacity-60 leading-relaxed line-clamp-2 mb-6 font-medium">{product.description}</p>
                                 </div>
-                                <p className="text-sm opacity-60 line-clamp-2 mb-4">{product.description}</p>
-                                <span className="text-xs uppercase tracking-widest opacity-40">{product.category}</span>
+
+                                <div className="mt-auto pt-6 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-1.5 h-1.5 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
+                                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">
+                                            {product.stock > 0 ? `${product.stock} Units Available` : 'Waitlisted'}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={() => router.push(`/shop/${product._id}`)}
+                                        className="text-[10px] font-black uppercase tracking-widest text-primary/40 hover:text-primary transition-colors"
+                                    >
+                                        Details →
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}

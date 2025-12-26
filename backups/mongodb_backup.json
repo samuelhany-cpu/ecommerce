@@ -1,0 +1,69 @@
+{
+  "products": [
+    {
+      "_id": "694d675a65b17be116aae906",
+      "name": "Classic Cognac Messenger",
+      "description": "A vintage-inspired messenger bag crafted from full-grain organic leather. Features antiqued brass hardware and a spacious interior for a 15-inch laptop.",
+      "price": 249.99,
+      "category": "Men",
+      "images": [
+        "/images/messenger.png"
+      ],
+      "stock": 12,
+      "createdAt": "2025-12-25T16:33:30.188Z",
+      "__v": 0
+    },
+    {
+      "_id": "694d675a65b17be116aae907",
+      "name": "Minimalist Bifold Wallet",
+      "description": "Slim, durable, and elegant. This dark brown leather wallet ages gracefully, featuring 6 card slots and a currency sleeve.",
+      "price": 79.5,
+      "category": "Accessories",
+      "images": [
+        "/images/wallet.png"
+      ],
+      "stock": 50,
+      "createdAt": "2025-12-25T16:33:30.188Z",
+      "__v": 0
+    },
+    {
+      "_id": "694d675a65b17be116aae908",
+      "name": "Signature Tote Bag",
+      "description": "Our best-selling tote for everyday elegance. Spacious, sturdy, and sustainably tanned. Perfect for work or weekend getaways.",
+      "price": 320,
+      "category": "Women",
+      "images": [
+        "/images/hero-bag.png"
+      ],
+      "stock": 8,
+      "createdAt": "2025-12-25T16:33:30.189Z",
+      "__v": 0
+    },
+    {
+      "_id": "694d675a65b17be116aae909",
+      "name": "Exec Cardholder",
+      "description": "For the professional who travels light. Textured premium leather cardholder with gold-foil embossing.",
+      "price": 55,
+      "category": "Men",
+      "images": [
+        "/images/hero-cardholder.png"
+      ],
+      "stock": 25,
+      "createdAt": "2025-12-25T16:33:30.189Z",
+      "__v": 0
+    },
+    {
+      "_id": "694d675a65b17be116aae90a",
+      "name": "Weekender Duffel",
+      "description": "The ultimate travel companion. Rugged yet refined, this large duffel bag fits everything you need for a 3-day trip.",
+      "price": 450,
+      "category": "Accessories",
+      "images": [
+        "/images/messenger.png"
+      ],
+      "stock": 5,
+      "createdAt": "2025-12-25T16:33:30.189Z",
+      "__v": 0
+    }
+  ]
+}
