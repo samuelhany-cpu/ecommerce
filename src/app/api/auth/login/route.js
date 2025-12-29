@@ -4,71 +4,87 @@ import { signToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
+// Simple validation helpers (بدون مكتبات إضافية)
+function isValidEmail(email) {
+  return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export async function POST(req) {
-    try {
-        await dbConnect();
-        const { email, password } = await req.json();
+  try {
+    await dbConnect();
 
-        // Check if user exists
-        const user = await User.findOne({ email });
+    const body = await req.json().catch(() => ({}));
+    const emailRaw = body?.email;
+    const password = body?.password;
 
-        // For demo: create admin if not exists
-        if (!user && email === 'samuelhany500@gmail.com') {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = await User.create({
-                email,
-                password: hashedPassword,
-                role: 'admin',
-                isVerified: true // Primary admin is pre-verified
-            });
-            const token = await signToken({ id: newUser._id.toString(), role: newUser.role, email: newUser.email });
+    const email = typeof emailRaw === 'string' ? emailRaw.trim().toLowerCase() : '';
 
-            const response = NextResponse.json({ success: true, user: { email: newUser.email, role: newUser.role } });
-            response.cookies.set('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 86400,
-                path: '/'
-            });
-            return response;
-        }
-
-        if (!user) {
-            return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 });
-        }
-
-        // Check verification status (Primary admin is exempt)
-        if (!user.isVerified && user.email !== 'samuelhany500@gmail.com') {
-            return NextResponse.json({
-                success: false,
-                error: 'Please verify your email address before logging in.',
-                needsVerification: true,
-                email: user.email
-            }, { status: 403 });
-        }
-
-        const token = await signToken({ id: user._id.toString(), role: user.role, email: user.email });
-        const response = NextResponse.json({ success: true, user: { email: user.email, role: user.role } });
-
-        // Set Secure Cookie
-        response.cookies.set('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 86400,
-            path: '/'
-        });
-
-        return response;
-
-    } catch (error) {
-        console.error('Login error:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    // ✅ Input validation
+    if (!isValidEmail(email) || typeof password !== 'string' || password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid email or password.' },
+        { status: 400 }
+      );
     }
+
+    // ✅ If your User model sets password select:false
+    const user = await User.findOne({ email }).select('+password');
+
+    // ✅ Don’t reveal whether user exists
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid credentials.' },
+        { status: 401 }
+      );
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid credentials.' },
+        { status: 401 }
+      );
+    }
+
+    // ✅ Verify status (if you want to enforce email verification)
+    if (!user.isVerified) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Please verify your email address before logging in.',
+          needsVerification: true,
+          email: user.email,
+        },
+        { status: 403 }
+      );
+    }
+
+    // ✅ Token payload: keep minimal (id + role)
+    const token = await signToken({
+      userId: user._id.toString(),
+      role: user.role,
+    });
+
+    const response = NextResponse.json({
+      success: true,
+      user: { email: user.email, role: user.role },
+    });
+
+    // ✅ Cookie best-practice
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24, // 1 day
+      path: '/',
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Login error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Something went wrong.' },
+      { status: 500 }
+    );
+  }
 }

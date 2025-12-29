@@ -4,68 +4,87 @@ import OTP from '@/models/OTP';
 import { sendOTPEmail } from '@/lib/email';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+
+function normalizeEmail(email) {
+  return typeof email === 'string' ? email.trim().toLowerCase() : '';
+}
 
 export async function POST(req) {
-    try {
-        await dbConnect();
-        const { email, password } = await req.json();
+  try {
+    await dbConnect();
 
-        if (!email || !password) {
-            return NextResponse.json({ success: false, error: 'Email and password required' }, { status: 400 });
-        }
+    const body = await req.json().catch(() => ({}));
+    const email = normalizeEmail(body.email);
+    const password = body.password;
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            if (existingUser.isVerified) {
-                return NextResponse.json({ success: false, error: 'Email already registered and verified' }, { status: 400 });
-            }
-            // If exists but not verified, we'll just send a new OTP
-        }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create or update user as unverified
-        let user;
-        if (existingUser) {
-            user = existingUser;
-            user.password = hashedPassword;
-            await user.save();
-        } else {
-            user = await User.create({
-                email,
-                password: hashedPassword,
-                role: 'customer',
-                isVerified: false
-            });
-        }
-
-        // Generate 6-digit OTP
-        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
-
-        // Delete old OTPs for this email
-        await OTP.deleteMany({ email });
-
-        // Save new OTP
-        await OTP.create({
-            email,
-            code: otpCode,
-            expiresAt
-        });
-
-        // Send OTP Email
-        await sendOTPEmail(email, otpCode);
-
-        return NextResponse.json({
-            success: true,
-            message: 'OTP sent successfully. Please verify your email.',
-            email: user.email
-        }, { status: 201 });
-
-    } catch (error) {
-        console.error('Registration Error:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    // ✅ Validation
+    if (!email || !password || password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid email or password.' },
+        { status: 400 }
+      );
     }
+
+    let user = await User.findOne({ email });
+
+    if (user && user.isVerified) {
+      return NextResponse.json(
+        { success: false, error: 'Email already registered.' },
+        { status: 400 }
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    if (user) {
+      user.password = hashedPassword;
+      user.isVerified = false;
+      await user.save();
+    } else {
+      user = await User.create({
+        email,
+        password: hashedPassword,
+        role: 'customer',
+        isVerified: false,
+      });
+    }
+
+    // ✅ Generate OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpHash = crypto
+      .createHash('sha256')
+      .update(otpCode)
+      .digest('hex');
+
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+
+    // Remove old OTPs
+    await OTP.deleteMany({ email });
+
+    await OTP.create({
+      email,
+      userId: user._id,
+      code: otpHash, // ✅ HASHED
+      expiresAt,
+      attempts: 0,
+    });
+
+    await sendOTPEmail(email, otpCode);
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Verification code sent to your email.',
+        email,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Register error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Something went wrong.' },
+      { status: 500 }
+    );
+  }
 }

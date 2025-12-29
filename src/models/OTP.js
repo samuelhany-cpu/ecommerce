@@ -1,41 +1,55 @@
 import mongoose from 'mongoose';
 
-const OTPSchema = new mongoose.Schema({
+const OTPSchema = new mongoose.Schema(
+  {
     email: {
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+      index: true,
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: false
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: false,
+      index: true,
     },
+
+    // ✅ Don't expose it in queries by default
+    // (In production الأفضل تخزن HASH بدل code plain text)
     code: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
+      select: false,
+      maxlength: 200,
     },
+
     attempts: {
-        type: Number,
-        default: 0
-    },
-    isUsed: {
-        type: Boolean,
-        default: false
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 20,
     },
     lastAttemptAt: {
-        type: Date
+      type: Date,
     },
     expiresAt: {
-        type: Date,
-        required: true
-    }
-}, {
-    timestamps: true
-});
+      type: Date,
+      required: true,
+      index: true,
+    },
+  },
+  {
+    timestamps: true,
+    strict: true,
+  }
+);
 
-// TTL index to automatically remove expired OTPs
+// TTL: remove expired OTPs automatically
 OTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+// Useful query patterns
+OTPSchema.index({ email: 1, expiresAt: -1 });
 
 export default mongoose.models.OTP || mongoose.model('OTP', OTPSchema);
